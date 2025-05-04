@@ -23,4 +23,4 @@ pub fn load_users_from_file() -> Vec<User> {
         Ok(contents) => serde_json::from_str(&contents).unwrap_or_else(|_| Vec::new()),
         Err(_) => Vec::new(),
     }
-} 
+}

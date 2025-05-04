@@ -1,14 +1,15 @@
 mod handlers;
-mod models;
-mod telemetry;
 #[cfg(test)]
 mod handlers_test;
+mod models;
+mod telemetry;
+mod open_telemetry;
 
-use actix_web::{web, App, HttpServer, middleware::Logger};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use std::sync::Mutex;
 use tracing::info;
 
-use crate::handlers::{AppState, create_user, get_user, get_users, health_check};
+use crate::handlers::{create_user, get_user, get_users, health_check, AppState};
 use crate::models::load_users_from_file;
 use crate::telemetry::init_tracing;
 
@@ -16,14 +17,14 @@ use crate::telemetry::init_tracing;
 async fn main() -> std::io::Result<()> {
     // Initialize tracing and OpenTelemetry
     init_tracing();
-    
+
     info!("Starting server...");
-    
+
     // Initialize application state
     let app_state = web::Data::new(AppState {
         users: Mutex::new(load_users_from_file()),
     });
-    
+
     // Start the HTTP server
     HttpServer::new(move || {
         App::new()

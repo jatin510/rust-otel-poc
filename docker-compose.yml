@@ -27,6 +27,7 @@ services:
 
   # Rust OpenTelemetry Application
   rust-app:
+    container_name: rust-otel-service
     build:
       context: .
       dockerfile: Dockerfile
