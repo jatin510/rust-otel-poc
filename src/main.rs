@@ -2,21 +2,30 @@ mod handlers;
 #[cfg(test)]
 mod handlers_test;
 mod models;
-mod telemetry;
+// mod telemetry;
 mod open_telemetry;
 
 use actix_web::{middleware::Logger, web, App, HttpServer};
+use opentelemetry::global;
+use opentelemetry::sdk::propagation::TraceContextPropagator;
+use opentelemetry::trace::TraceError;
 use std::sync::Mutex;
 use tracing::info;
+use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 
 use crate::handlers::{create_user, get_user, get_users, health_check, AppState};
 use crate::models::load_users_from_file;
-use crate::telemetry::init_tracing;
+use crate::open_telemetry::init_trace;
+// use crate::telemetry::init_tracing;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // Initialize tracing and OpenTelemetry
-    init_tracing();
+    global::set_text_map_propagator(TraceContextPropagator::new());
+    let tracer = init_trace().unwrap();
+    let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+    let subscriber = tracing_subscriber::Registry::default().with(telemetry);
+    tracing::subscriber::set_global_default(subscriber).unwrap();
 
     info!("Starting server...");
 
