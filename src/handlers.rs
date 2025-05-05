@@ -9,12 +9,23 @@ pub struct AppState {
     pub users: Mutex<Vec<User>>,
 }
 
+
+#[instrument]
+fn hello() {
+    let mut x = 0;
+    for i in 0..1000000 {
+        x += 1;
+    }
+    info!(x);
+}
+
 // Health check endpoint
 #[instrument]
 pub async fn health_check() -> impl Responder {
     println!("health check called");
     info!("Health check endpoint called");
     debug!("Returning healthy status");
+    hello();
     HttpResponse::Ok().json(serde_json::json!({ "status": "healthy" }))
 }
 
