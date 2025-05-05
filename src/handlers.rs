@@ -12,6 +12,7 @@ pub struct AppState {
 // Health check endpoint
 #[instrument]
 pub async fn health_check() -> impl Responder {
+    println!("health check called");
     info!("Health check endpoint called");
     debug!("Returning healthy status");
     HttpResponse::Ok().json(serde_json::json!({ "status": "healthy" }))
